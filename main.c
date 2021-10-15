@@ -84,7 +84,7 @@ int cond(int i, int j, t_ope *ope)
 
 	if (dist > ope->rad)
 		return (0);
-	if (ope->rad - (dist) <= 1.00000000)
+	if (ope->rad - (dist) < 1)
 		return(2);
 	return (1);
 }
@@ -111,19 +111,21 @@ void print_err(void)
 	int len;
 
 	len = ft_strlen("Error: Operation file corrupted\n");
-	write(1, "Error: Operation file corrupted", len);
+	write(1, "Error: Operation file corrupted\n", len);
 }
 
 int next_ope(FILE *file, t_inf *inf, t_ope *ope)
 {
-	char vidbuf;
 	int ret;
 
 	ret = fscanf(file, "%c %f %f %f %c\n", &(ope->type), &(ope->x), &(ope->y), &(ope->rad), &(ope->car));
 	if (ret == -1)
 		return (1);
-	if (ret != 5)
-		return (2);
+	if (ret != 5 || (ope->type != 'c' && ope->type != 'C') || ope->rad <= 0)
+	{
+		//printf("%d", ret);
+		return(2);
+	}
 	draw(inf, ope);
 	return (0);
 }
@@ -133,7 +135,6 @@ int main(int argc, char *argv[])
 	FILE *file;
 	t_inf inf;
 	t_ope ope;
-	char c;
 	int status;
 
 	status = 0;
